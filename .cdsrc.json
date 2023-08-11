@@ -1,0 +1,21 @@
+{
+    "[development]": {
+        "auth": {
+            "passport": {
+                "strategy": "mock",
+                "users": {
+                    "vendor@tester.sap.com": {
+                        "password": "initial",
+                        "ID": "Vendor",
+                        "userAttributes": {
+                            "email": "vendor@tester.sap.com"
+                        },
+                        "roles": [
+                            "Admin" , "Viewer" , "Subscriber"
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}

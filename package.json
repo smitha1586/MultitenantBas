@@ -1,0 +1,122 @@
+{
+  "name": "appSmithaMulti",
+  "version": "0.0.1",
+  "repository": "<Add your repository here>",
+  "license": "UNLICENSED",
+  "description": "Business Application",
+  "engines": {
+    "node": "^16"
+  },
+  "dependencies": {
+    "@sap/audit-logging": "^5",
+    "@sap/cds": "^6.0.0",
+    "@sap/cds-dk": "^7.0.0",
+    "@sap/cds-mtxs": "^1.1",
+    "@sap/xsenv": "^3",
+    "@sap/xssec": "^3",
+    "debug": "^4.3",
+    "express": "^4",
+    "hdb": "^0.19",
+    "passport": "^0.4.1",
+    "@sap/cds-hana": "^2"
+  },
+  "devDependencies": {
+    "@sap/ux-specification": "^1.108.11",
+    "sqlite3": "^5.0.0"
+  },
+  "sapux": [
+    "app/resources/fiori",
+    "app/employees"
+  ],
+  "scripts": {
+    "start": "cds run",
+    "watch-employees": "cds watch --open employees/webapp/index.html?sap-ui-xx-viewCache=false"
+  },
+  "eslintConfig": {
+    "extends": "eslint:recommended",
+    "env": {
+      "es2020": true,
+      "node": true,
+      "jest": true,
+      "mocha": true
+    },
+    "globals": {
+      "SELECT": true,
+      "INSERT": true,
+      "UPDATE": true,
+      "DELETE": true,
+      "CREATE": true,
+      "DROP": true,
+      "CDL": true,
+      "CQL": true,
+      "CXL": true,
+      "cds": true
+    },
+    "rules": {
+      "no-console": "off",
+      "require-atomic-updates": "off"
+    }
+  },
+  "cds": {
+    "hana": {
+      "deploy-format": "hdbtable"
+    },
+    "requires": {
+      "uaa": {
+        "kind": "xsuaa"
+      },
+      "auth": {
+        "[production]": {
+          "strategy": "JWT"
+        },
+        "[development]": {
+          "strategy": "mock",
+          "users": {
+            "joe": {
+              "roles": [
+                "Admin",
+                "Viewer",
+                "internal-user"
+              ],
+              "tenant": "t1"
+            },
+            "julie": {
+              "roles": [
+                "Viewer"
+              ],
+              "tenant": "t2"
+            },
+            "bob": {
+              "roles": [
+                "Viewer"
+              ],
+              "tenant": "t3"
+            }
+          }
+        }
+      },
+      "db": {
+        "[production]": {
+          "kind": "hana"
+        },
+        "[development]": {
+          "kind": "sql-mt",
+          "model": [
+            "db/data-config",
+            "db/data-test"
+          ]
+        },
+        "model": [
+          "db",
+          "srv"
+        ],
+        "vcap": {
+          "label": "service-manager"
+        }
+      },
+      "multitenancy": true,
+      "toggles": false,
+      "extensibility": false
+    }
+  }
+}

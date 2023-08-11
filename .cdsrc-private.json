@@ -1,0 +1,36 @@
+{
+  "requires": {
+    "db": {
+      "binding": {
+        "type": "cf",
+        "apiEndpoint": "https://api.cf.eu10-004.hana.ondemand.com",
+        "org": "cf-ic-2023-q2",
+        "space": "team1409",
+        "instance": "appSmithaMulti-db",
+        "key": "appSmithaMulti-db-key",
+        "resolved": false
+      },
+      "kind": "hana",
+      "vcap": {
+        "name": "db"
+      }
+    },
+    "[hybrid]": {
+      "db": {
+        "binding": {
+          "type": "cf",
+          "apiEndpoint": "https://api.cf.eu10-004.hana.ondemand.com",
+          "org": "cf-ic-2023-q2",
+          "space": "team1409",
+          "instance": "appSmithaMulti-db",
+          "key": "appSmithaMulti-db-key",
+          "resolved": false
+        },
+        "kind": "hana",
+        "vcap": {
+          "name": "db"
+        }
+      }
+    }
+  }
+}

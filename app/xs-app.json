@@ -1,0 +1,25 @@
+{
+    "welcomeFile": "index.html",
+    "authenticationMethod": "route",
+    "routes": [
+        {
+            "source": "^/catalog/(.*)$",
+            "authenticationType": "xsuaa",
+            "scope": "$XSAPPNAME.Viewer",
+            "destination": "srv"
+        }
+        ,
+        {
+            "source": "^/-/cds/.*",
+            "authenticationType": "none",
+            "destination": "mtx"
+        }
+        ,
+        {
+            "source": "^/(.*)$",
+            "authenticationType": "xsuaa",
+            "scope": "$XSAPPNAME.Viewer",
+            "localDir": "resources"
+        }
+    ]
+}

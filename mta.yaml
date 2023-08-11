@@ -1,0 +1,130 @@
+_schema-version: '3.2'
+ID: appSmithaMulti
+version: 0.0.1
+
+parameters:
+  enable-parallel-deployments: true
+
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm install --production
+        - npx -p @sap/cds-dk cds build --production
+
+modules:
+
+  # --------------------- SERVER MODULE ------------------------
+  - name: appSmithaMulti-srv
+    # ------------------------------------------------------------
+    type: nodejs
+    path: gen/srv
+    build-parameters:
+      ignore:
+        - default-*.json
+        - .env
+        - "*node_modules*"
+        - package-lock.json
+    parameters:
+      buildpack: nodejs_buildpack
+      memory: 512M
+      disk-quota: 1024M
+    requires:
+      - name: appSmithaMulti-uaa
+      - name: appSmithaMulti-registry
+      - name: appSmithaMulti-sm
+      - name: app-api
+        properties:
+          APP_PROTOCOL: ~{app-protocol}
+          APP_URI: ~{app-uri}
+    provides:
+      - name: srv-api
+        properties:
+          srv-url: ${default-url}
+      - name: mtx-api
+        properties:
+          mtx-url: ${default-url}
+
+  # ------------------ APP ROUTER MODULE -----------------------
+  - name: appSmithaMulti-app
+    # ------------------------------------------------------------
+    type: approuter.nodejs
+    path: app
+    build-parameters:
+      ignore:
+        - default-*.json
+        - .env
+        - "*node_modules*"
+        - package-lock.json
+    parameters:
+      memory: 256M
+      disk-quota: 1024M
+      keep-existing-routes: true
+    properties:
+      TENANT_HOST_PATTERN: '^(.*)-${default-uri}'
+    requires:
+      - name: appSmithaMulti-uaa
+      - name: srv-api
+        group: destinations
+        properties:
+          name: srv
+          url: ~{srv-url}
+          timeout: 600000
+          forwardAuthToken: true
+      - name: mtx-api
+        group: destinations
+        properties:
+          name: mtx
+          url: ~{mtx-url}
+          timeout: 600000
+    provides:
+      - name: app-api
+        properties:
+          app-protocol: ${protocol}
+          app-uri: ${default-uri}
+
+resources:
+  # ----------------------- UAA SERVICE ------------------------
+  - name: appSmithaMulti-uaa
+    # ------------------------------------------------------------
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
+
+  # --------------------- REGISTRY SERVICE ---------------------
+  - name: appSmithaMulti-registry
+    # ------------------------------------------------------------
+    type: org.cloudfoundry.managed-service
+    requires:
+      - name: mtx-api
+    parameters:
+      service: saas-registry
+      service-plan: application
+      service-name: appSmithaMulti-registry
+      config:
+        xsappname: appSmithaMulti
+        appName: appSmithaMulti
+        displayName: 'App multi'
+        description: 'Business Application'
+        category: 'SaaS Multitenant Apps'
+        appUrls:
+          onSubscription: ~{mtx-api/mtx-url}/-/cds/saas-provisioning/tenant/{tenantId}
+          onSubscriptionAsync: false
+          onUnSubscriptionAsync: false
+          callbackTimeoutMillis: 300000
+
+  # ------------------- SERVICE MANAGER SERVICE ----------------
+  - name: appSmithaMulti-sm
+    # ------------------------------------------------------------
+    type: org.cloudfoundry.managed-service
+    requires:
+      - name: appSmithaMulti-uaa
+    parameters:
+      service: service-manager
+      service-plan: container
+      polling_timeout_seconds: 240
+      config:
+        acquireTimeoutMillis: max
+        polling_timeout_seconds: 480
