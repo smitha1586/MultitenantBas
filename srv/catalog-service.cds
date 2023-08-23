@@ -1,55 +1,125 @@
-using {appSmithaMulti.db as db} from '../db/data-model';
+using {sap.cim.log.tms as tms} from '../db/data-model';
 
-using {
-  CV_SALES,
-  CV_SESSION_INFO
-} from '../db/data-model';
-
-
-service CatalogService @(path: '/catalog') @(requires: 'authenticated-user') {
-  entity Sales @(restrict: [
+@path: 'service/tms'
+service tmsService {
+  @odata.draft.enabled
+  entity Stops @(restrict: [
     {
       grant: ['READ'],
-      to   : 'Viewer'
+      to   : ['TMSViewer']
     },
     {
-      grant: ['WRITE'],
-      to   : 'Admin'
+      grant: ['*'],
+      to   : ['TMSManager']
     }
-  ])                                               as select * from db.Sales actions {
-                                                        @(restrict: [{to: 'Admin'}])
-                                                        action boost() returns Sales;
-                                                      };
+  ])                    as projection on tms.Stops;
 
-  entity Employees     as select * from db.Employees;
 
+  // @odata.draft.enabled
+  entity StopFacilities @(restrict: [
+    {
+      grant: ['READ'],
+      to   : ['TMSViewer']
+    },
+    {
+      grant: ['*'],
+      to   : ['TMSManager']
+    }
+  ])                      as projection on tms.StopFacilities;
+
+  @odata.draft.enabled
+  entity Routes   @(restrict: [
+    {
+      grant: ['READ'],
+      to   : ['TMSViewer']
+    },
+    {
+      grant: ['*'],
+      to   : ['TMSManager']
+    }
+  ])                           as projection on tms.Routes;
+
+  // annotate tmsService.Routes with @odata.draft.enabled;
+  entity RouteStops     @(restrict: [
+    {
+      grant: ['READ'],
+      to   : ['TMSViewer']
+    },
+    {
+      grant: ['*'],
+      to   : ['TMSManager']
+    }
+  ])                     as projection on tms.RouteStops;
+
+  entity Employees       @(restrict: [
+    {
+      grant: ['READ'],
+      to   : ['TMSViewer']
+    },
+    {
+      grant: ['*'],
+      to   : ['TMSManager']
+    }
+  ])                    as projection on tms.Employees;
   annotate Employees with @odata.draft.enabled;
+  
+  entity Crew           @(restrict: [
+    {
+      grant: ['READ'],
+      to   : ['TMSViewer']
+    },
+    {
+      grant: ['*'],
+      to   : ['TMSManager']
+    }
+  ])                     as projection on tms.Crew;
+  annotate Crew with @odata.draft.enabled;
+  
+  entity StopTypes    @(restrict: [
+    {
+      grant: ['READ'],
+      to   : ['TMSViewer']
+    },
+    {
+      grant: ['*'],
+      to   : ['TMSManager']
+    }
+  ])                       as projection on tms.StopTypes;
+
+// @odata.draft.enabled
+//entity Vehicle  as projection on tms.Vehicle;
 
 
-  @readonly
-  entity VSales @(restrict: [{to: 'Viewer'}])      as select * from CV_SALES;
-
-  @readonly
-  entity SessionInfo @(restrict: [{to: 'Viewer'}]) as select * from CV_SESSION_INFO;
-
-  function topSales @(restrict: [{to: 'Viewer'}])(amount : Integer) returns many Sales;
+@odata.draft.enabled
+entity ticket  as projection on tms.ticket;
 
 
-  type userScopes {
-    identified    : Boolean;
-    authenticated : Boolean;
-    Viewer        : Boolean;
-    Admin         : Boolean;
-  };
-
-  type userType {
-    user   : String;
-    locale : String;
-    tenant : String;
-    scopes : userScopes;
-  };
-
-  function userInfo()                                               returns userType;
+/*  entity ticket   @(restrict: [
+    {
+      grant: ['READ'],
+      to   : ['TMSViewer']
+    },
+    {
+      grant: ['*'],
+      to   : ['TMSManager']
+    }
+  ])  as projection on tms.ticket;  */
 
 
+@odata.draft.enabled
+entity Schedule  as projection on tms.Schedule;
+// annotate Schedule with @odata.draft.enabled;
+
+
+  // @odata.draft.enabled
+  // entity Schedule@(restrict: [
+  //   {
+  //     grant: ['READ'],
+  //     to   : ['TMSViewer']
+  //   },
+  //   {
+  //     grant: ['*'],
+  //     to   : ['TMSManager']
+  //   }
+  // ])                    as projection on tms.Schedule;
 };

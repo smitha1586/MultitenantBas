@@ -3,7 +3,7 @@ using {
   sap.common.CodeList as CodeList
 } from '@sap/cds/common';
 
-context appSmithaMulti.db {
+context sap.cim.log.tms {
 
   entity Stops : managed {
     key id             : UUID @(Core.Computed: true);
