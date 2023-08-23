@@ -1,6 +1,6 @@
 using tmsService from './catalog-service';
 
-annotate tmsService.Routes with {
+annotate tmsService.Routes with{
   ID        @UI   : {Hidden: true};
   routeCode @title: 'Route Code';
   routeName @title: 'Route Name';
